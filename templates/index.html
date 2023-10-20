@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
     <title>IR | Home</title>
 </head>
 <body>
-    <h1>Information Retrieval!</h1>
+    <div class="search__box">
+        <div class="search__row">
+            <input type="text" id="input-box" placeholder="Type..." autocomplete="off">
+            <button class="search__button"><i class="uil uil-search search__icon"></i></button>
+        </div>
+
+        <div class="results__box">
+        </div>
+    </div>
+
     <script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
 </body>
 </html>
