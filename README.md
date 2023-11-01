@@ -20,3 +20,7 @@ python app.py
 ```
 - The app should start, and you'll see a message indicating that the server is running.
 - Open your web browser and go to `http://localhost:5000/` to access the app.
+
+# Authors
+-  [Alexia Ntantouri](https://github.com/alexia-nt)
+-  [Maria Stavrianopoulou](https://github.com/stavrmaria)
