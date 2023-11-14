@@ -62,7 +62,8 @@ def query():
         if not user_query:
             raise ValueError('Query parameter is missing.')
 
-        response = process_text(user_query)
+        processed_query = process_text(user_query)
+        response = Response(json.dumps(processed_query, ensure_ascii=False), content_type=content_type)
         return response
     except Exception as e:
         return jsonify({"error": str(e)})
