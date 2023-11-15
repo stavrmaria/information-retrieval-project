@@ -3,7 +3,7 @@ import json
 import os
 from index import construct_inverted_index, save_index, process_text
 from vectorizer import calculate_tf_idf, save_tf_idf
-from results import get_results
+from results import get_results, get_result
 
 DATA_FILE = 'sample_data.csv'
 INDEX_FILE = 'inverted_index.json'
@@ -30,6 +30,20 @@ def index():
 
     return render_template('results.html', query=query, results=results)
 
+@views.route('/result', methods=['GET'])
+def show_result():
+    try:
+        # Get the query from the URL parameters
+        doc = request.args.get('doc')
+        if not doc:
+            raise ValueError('Query parameter is missing.')
+
+        result = get_result(doc, csv_file_path)
+
+        # print(df_speeches.shape, file=sys.stderr)
+        return render_template('result.html', result=result)
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 @views.route('/get_index')
 def get_index():
