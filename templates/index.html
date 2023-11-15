@@ -8,15 +8,17 @@
     <title>IR | Home</title>
 </head>
 <body>
-    <div class="search__box">
-        <div class="search__row">
-            <input type="text" id="input-box" placeholder="Type..." autocomplete="off">
-            <button class="search__button"><i class="uil uil-search search__icon"></i></button>
-        </div>
+    <form method="GET">
+        <div class="search__box">
+            <div class="search__row">
+                <input type="text" name="search-input" id="input-box" placeholder="Type..." autocomplete="off">
+                <button type="submit" class="search__button"><i class="uil uil-search search__icon"></i></button>
+            </div>
 
-        <div class="results__box">
+            <div class="results__box">
+            </div>
         </div>
-    </div>
+    </form>
 
     <script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
 </body>

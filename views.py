@@ -3,6 +3,7 @@ import json
 import os
 from index import construct_inverted_index, save_index, process_text
 from vectorizer import calculate_tf_idf, save_tf_idf
+from results import get_results
 
 DATA_FILE = 'sample_data.csv'
 INDEX_FILE = 'inverted_index.json'
@@ -18,9 +19,17 @@ tfidf_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_FIL
 content_type='application/json; charset=utf-8'
 views = Blueprint(__name__, "views")
 
-@views.route('/')
+@views.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    query = request.args.get('search-input', type=str)
+
+    if not query:
+        return render_template('index.html')
+
+    results = get_results(query)
+
+    return render_template('results.html', query=query, results=results)
+
 
 @views.route('/get_index')
 def get_index():
