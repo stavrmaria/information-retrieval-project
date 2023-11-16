@@ -39,3 +39,8 @@ function selectInput(list) {
     inputBox.value = list.innerHTML;
     resultsBox.innerHTML = '';
 }
+
+function toggleTheme() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
+}

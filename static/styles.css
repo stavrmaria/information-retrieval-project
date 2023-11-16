@@ -1,5 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
+:root {
+    /* Light Theme */
+    --primary-color: #EEEEEE;
+    --secondary-color: #ffffff;
+    --primary-font-color: #222831;
+    --secondary-font-color: #393E46;
+    --primary-button-color: #2663cd;
+}
+
+.dark-mode {
+    --primary-color: #121212;
+    --secondary-color: #1e1e1e;
+    --primary-font-color: #FFFFFF;
+    --secondary-font-color: #B0B0B0;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -9,13 +25,13 @@
 }
 
 body {
-    background: #767B91;
-    color: #767B91;
+    background: var(--primary-color);
+    color: var(--primary-font-color);
 }
 
 .search__box {
     width: 70%;
-    background: #E1E5EE;
+    background: var(--secondary-color);
     margin: 200px auto 0;
     border-radius: 5px;
 }
@@ -33,7 +49,18 @@ input {
     border: 0;
     outline: 0;
     font-size: 16px;
-    color: #2A324B;
+    color: var(--primary-font-color);
+}
+
+.theme__button {
+    background: transparent;
+    padding: 20px;
+    border: 0;
+    outline: 0;
+    width: 20px;
+    color: var(--secondary-font-color);
+    font-size: 22px;
+    cursor: pointer;
 }
 
 .search__button {
@@ -41,13 +68,13 @@ input {
     border: 0;
     outline: 0;
     width: 20px;
-    color: #2A324B;
+    color: var(--secondary-font-color);
     font-size: 22px;
     cursor: pointer;
 }
 
 #input_box::placeholder {
-    color: black;
+    color: var(--primary-font-color);
 }
 
 .results__box ul {
@@ -63,7 +90,7 @@ input {
 }
 
 .results__box ul li:hover {
-    background: #c5c9e3;
+    background: var(--primary-color);
 }
 
 .results__box {
