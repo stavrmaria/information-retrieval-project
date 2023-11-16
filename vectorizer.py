@@ -29,8 +29,9 @@ def calculate_tf_idf(data_file_path):
         term_tfidf_values = tfidf_matrix[:, term_idx].data
         # Extract the row indices of the non-zero values
         nonzero_row_indices = tfidf_matrix[:, term_idx].nonzero()[0]
-        for i in range(len(term_tfidf_values)):
-            doc_tfidf_dict = {str(nonzero_row_indices[i]): term_tfidf_values[i]} # {doc_id: tfidf_value}
+
+        doc_tfidf_dict = {str(nonzero_row_indices[i]): term_tfidf_values[i] for i in range(len(term_tfidf_values))} # {doc_id: tfidf_value}
+        
         tfidf_dict[term] = doc_tfidf_dict
     
     return tfidf_dict
