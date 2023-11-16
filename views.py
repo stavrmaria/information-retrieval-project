@@ -26,7 +26,7 @@ def index():
     if not query:
         return render_template('index.html')
 
-    results = get_results(query)
+    results = get_results(query, csv_file_path)
 
     return render_template('results.html', query=query, results=results)
 

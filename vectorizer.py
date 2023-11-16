@@ -4,6 +4,8 @@ import json
 import pandas as pd
 from index import process_text
 
+import pickle
+
 def load_inverted_index(json_file, encoding='utf-8'):
     # Load the inverted index from the JSON file
     with open(json_file, 'r', encoding=encoding) as file:
@@ -21,6 +23,14 @@ def calculate_tf_idf(data_file_path):
     tfidf_matrix = vectorizer.fit_transform(processed_texts)
     feature_names = vectorizer.get_feature_names_out()    
     document_ids = df_speeches.index
+
+    # Save the array to a file using pickle
+    with open('matrix.pkl', 'wb') as file:
+        pickle.dump(tfidf_matrix, file)
+
+    # Save the fitted vectorizer to a file
+    with open('tfidf_vectorizer.pkl', 'wb') as file:
+        pickle.dump(vectorizer, file)
     
     # Create a dictionary to store the TF-IDF representation
     tfidf_dict = {}
@@ -31,7 +41,7 @@ def calculate_tf_idf(data_file_path):
         nonzero_row_indices = tfidf_matrix[:, term_idx].nonzero()[0]
 
         doc_tfidf_dict = {str(nonzero_row_indices[i]): term_tfidf_values[i] for i in range(len(term_tfidf_values))} # {doc_id: tfidf_value}
-        
+
         tfidf_dict[term] = doc_tfidf_dict
     
     return tfidf_dict
