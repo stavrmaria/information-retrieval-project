@@ -27,7 +27,10 @@ def calculate_tf_idf(data_file_path):
     for term_idx, term in enumerate(feature_names):
         # Extract non-zero TF-IDF values for the term
         term_tfidf_values = tfidf_matrix[:, term_idx].data
-        doc_tfidf_dict = {doc_id: tfidf_value for doc_id, tfidf_value in zip(document_ids, term_tfidf_values)}
+        # Extract the row indices of the non-zero values
+        nonzero_row_indices = tfidf_matrix[:, term_idx].nonzero()[0]
+        for i in range(len(term_tfidf_values)):
+            doc_tfidf_dict = {str(nonzero_row_indices[i]): term_tfidf_values[i]} # {doc_id: tfidf_value}
         tfidf_dict[term] = doc_tfidf_dict
     
     return tfidf_dict
