@@ -23,6 +23,14 @@
     padding-left: 20px;
 }
 
+.result_title:link {
+    color: purple;
+  }
+
+.result_title:visited {
+    color: rgb(165, 134, 165);
+}
+
 .link {
     color: purple;
 }
