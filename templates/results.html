@@ -8,6 +8,8 @@
     <title>IR | Results</title>
 </head>
 <body>
+    <button class="theme__button" onclick="toggleTheme()"><i class="uil uil-moon"></i></button>
+
     <div class="title">
         <h1>Search for: {{query}}</h1>
     </div>
@@ -28,5 +30,7 @@
             </div>
         </div>
     {% endfor %}
+
+    <script type="text/javascript" src="{{ url_for('static', filename='results.js') }}"></script>
 </body>
 </html>

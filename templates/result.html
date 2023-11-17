@@ -8,10 +8,14 @@
     <title>IR | Results</title>
 </head>
 <body>
+    <button class="theme__button" onclick="toggleTheme()"><i class="uil uil-moon"></i></button>
+
     {% for r in result%}
         <div class="speech_info">
             {{r}}
         </div>
     {% endfor %}
+
+    <script type="text/javascript" src="{{ url_for('static', filename='results.js') }}"></script>
 </body>
 </html>

@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
+/* import main styles.css */
+@import url('styles.css');
+
 * {
     margin: 0;
     padding: 0;
@@ -8,10 +11,6 @@
     font-weight: 500;
 }
 
-/* body {
-    background: #767B91;
-    color: #767B91;
-} */
 .title {
     padding-top: 50px;
     padding-bottom: 20px;
