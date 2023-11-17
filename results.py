@@ -80,9 +80,11 @@ def get_result(doc_id, data_file_path):
     df_speeches = pd.read_csv(data_file_path)
 
     doc_id = int(doc_id)
-    result.append(df_speeches.values[doc_id][0]) # name
-    result.append(df_speeches.values[doc_id][1]) # date
-    result.append(df_speeches.values[doc_id][5]) # political party
-    result.append(df_speeches.values[doc_id][10]) # speech
+    for i in range(11):
+        result.append(df_speeches.values[doc_id][i])
+    # result.append(df_speeches.values[doc_id][0]) # name
+    # result.append(df_speeches.values[doc_id][1]) # date
+    # result.append(df_speeches.values[doc_id][5]) # political party
+    # result.append(df_speeches.values[doc_id][10]) # speech
 
     return result
