@@ -13,14 +13,15 @@
     color: #767B91;
 } */
 .title {
-    padding-top: 20px;
-    padding-left: 20px;
+    padding-top: 50px;
+    padding-bottom: 20px;
+    padding-left: 100px;
 }
 
 .result {
     padding-top: 20px;
     padding-bottom: 20px;
-    padding-left: 20px;
+    padding-left: 100px;
 }
 
 .result_title:link {
