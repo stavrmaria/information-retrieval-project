@@ -41,14 +41,15 @@ def get_results(query, data_file_path):
     # print(query_tfidf.shape, file=sys.stderr)
 
     # Get indices of the 5 greatest values
-    top_indices = np.argsort(cosine_similarities)[-5:][::-1]
+    k = 6
+    top_indices = np.argsort(cosine_similarities)[-k:][::-1]
 
     # print(top_indices, file=sys.stderr)
 
     df_speeches = pd.read_csv(data_file_path)
 
     results = []
-    for i in range(5):
+    for i in range(k):
         doc_id=top_indices[i]
         # print(df_speeches.values[doc_id][10], file=sys.stderr)
 
