@@ -74,6 +74,20 @@ input {
     right: 0;
 }
 
+.return__button {
+    background: transparent;
+    padding: 20px;
+    margin-right: 20px;
+    border: 0;
+    outline: 0;
+    width: 20px;
+    color: var(--secondary-font-color);
+    font-size: 28px;
+    cursor: pointer;
+    position: fixed;
+}
+
+
 .search__button {
     background: transparent;
     border: 0;
