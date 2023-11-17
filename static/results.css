@@ -24,21 +24,21 @@
 }
 
 .result_title:link {
-    color: purple;
+    color: var(--link-color)
   }
 
 .result_title:visited {
-    color: rgb(165, 134, 165);
+    color: var(--visited-link-color);
 }
 
 .link {
-    color: purple;
+    color: var(--link-color);
 }
 
 .details {
-    color: green;
+    color: var(--details-color);
 }
 
 .score {
-    color: rgb(85, 85, 85);
+    color: var(--score-color);
 }
