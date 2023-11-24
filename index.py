@@ -7,14 +7,16 @@ import json
 from snowballstemmer import stemmer
 
 def process_text(text):
-    greek_stemmer = stemmer("greek")
-    translator = str.maketrans("", "", string.punctuation)
-    text = text.translate(translator)
-
-    stop = set(stopwords.words('greek') + list(string.punctuation))
-    tokens = [i for i in word_tokenize(text.lower()) if i not in stop]
-    stemmed_tokens = [greek_stemmer.stemWord(token) for token in tokens]
-    return stemmed_tokens
+    if isinstance(text, str):
+        greek_stemmer = stemmer("greek")
+        translator = str.maketrans("", "", string.punctuation)
+        text = text.translate(translator)
+        stop = set(stopwords.words('greek') + list(string.punctuation))
+        tokens = [i for i in word_tokenize(text.lower()) if i not in stop]
+        stemmed_tokens = [greek_stemmer.stemWord(token) for token in tokens]
+        return ' '.join(stemmed_tokens)
+    else:
+        return ''
 
 # Save the inverted index to the JSON file
 def save_index(inverted_index, json_file_path):

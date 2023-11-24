@@ -1,9 +1,12 @@
 import os
+import sys
+import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import json
 import pandas as pd
 from index import process_text
 
+from scipy import sparse
 import pickle
 
 def load_inverted_index(json_file, encoding='utf-8'):
@@ -12,40 +15,25 @@ def load_inverted_index(json_file, encoding='utf-8'):
         inverted_index = json.load(file)
     return dict(inverted_index)
 
-# Apply TF-IDF weights to a document collection based on the inverted index stored in a JSON file
 def calculate_tf_idf(data_file_path):
-    # Read the speech column of the csv file
-    df_speeches = pd.read_csv(data_file_path, usecols=['speech'])
-    tokenized_speeches = df_speeches['speech'].apply(process_text)
-    processed_texts = [" ".join(tokens) for tokens in tokenized_speeches]
-    
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform(processed_texts)
-    feature_names = vectorizer.get_feature_names_out()    
-    document_ids = df_speeches.index
+    df = pd.read_csv(data_file_path, usecols=['speech'])
+    processed_text = df['speech'].apply(process_text)
 
-    # Save the array to a file using pickle
-    with open('matrix.pkl', 'wb') as file:
-        pickle.dump(tfidf_matrix, file)
+    tfidf_vectorizer = TfidfVectorizer(
+        max_df=0.95,
+        max_features=None
+    )
 
+    tfidf_matrix = tfidf_vectorizer.fit_transform(processed_text)
+    tfidf_vocab = tfidf_vectorizer.get_feature_names_out()
+
+    return tfidf_matrix, tfidf_vectorizer, tfidf_vocab
+
+def save_tf_idf(tfidf_measurements, tfidf_file_path, tfidf_vocab_file_path, tfidf_vectorizer_file_path):
+    # Save the TF-IDF matrix in CSR format using scipy
+    sparse.save_npz(tfidf_file_path, tfidf_measurements[0])
     # Save the fitted vectorizer to a file
-    with open('tfidf_vectorizer.pkl', 'wb') as file:
-        pickle.dump(vectorizer, file)
-    
-    # Create a dictionary to store the TF-IDF representation
-    tfidf_dict = {}
-    for term_idx, term in enumerate(feature_names):
-        # Extract non-zero TF-IDF values for the term
-        term_tfidf_values = tfidf_matrix[:, term_idx].data
-        # Extract the row indices of the non-zero values
-        nonzero_row_indices = tfidf_matrix[:, term_idx].nonzero()[0]
-
-        doc_tfidf_dict = {str(nonzero_row_indices[i]): term_tfidf_values[i] for i in range(len(term_tfidf_values))} # {doc_id: tfidf_value}
-
-        tfidf_dict[term] = doc_tfidf_dict
-    
-    return tfidf_dict
-
-def save_tf_idf(tf_idf_index, json_file, encoding='utf-8'):
-    with open(json_file, 'w', encoding=encoding) as f:
-        json.dump(tf_idf_index, f, indent=4, ensure_ascii=False)
+    with open(tfidf_vectorizer_file_path, 'wb') as file:
+        pickle.dump(tfidf_measurements[1], file)
+    # Save the corresponding vocabulary (features) using numpy
+    np.save(tfidf_vocab_file_path, np.array(tfidf_measurements[2]))
