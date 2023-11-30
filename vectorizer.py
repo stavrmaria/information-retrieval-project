@@ -20,7 +20,7 @@ def calculate_tf_idf(data_file_path):
     processed_text = df['speech'].apply(process_text)
 
     tfidf_vectorizer = TfidfVectorizer(
-        max_df=0.95,
+        max_df=0.9,
         max_features=None
     )
 
