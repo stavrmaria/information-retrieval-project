@@ -1,5 +1,6 @@
 import os
 import sys
+import joblib
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import json
@@ -35,5 +36,7 @@ def save_tf_idf(tfidf_measurements, tfidf_file_path, tfidf_vocab_file_path, tfid
     # Save the fitted vectorizer to a file
     with open(tfidf_vectorizer_file_path, 'wb') as file:
         pickle.dump(tfidf_measurements[1], file)
-    # Save the corresponding vocabulary (features) using numpy
-    np.save(tfidf_vocab_file_path, np.array(tfidf_measurements[2]))
+    # Save the corresponding vocabulary (features) 
+    with open(tfidf_vocab_file_path, 'wb') as file:
+        pickle.dump(tfidf_measurements[2], file)
+
