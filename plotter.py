@@ -79,7 +79,7 @@ def get_top_keywords(csv_file_path, tfidf_file_path, tfidf_vocab_file_path, top_
         response.write(json_object)
     return redirect('/top_keywords_plot')
 
-# Function to extract dates, top words, and TF-IDF values for each member
+# Function to extract dates, top words values for each member
 def extract_dates_top_words_per_member(data):
     member_dates = {}
     member_top_words = {}
@@ -96,7 +96,7 @@ def extract_dates_top_words_per_member(data):
     
     return member_dates, member_top_words
 
-# Function to extract dates, top words, and TF-IDF values for each political party
+# Function to extract dates, top words values for each political party
 def extract_dates_top_words_per_party(data):
     party_dates = {}
     party_top_words = {}
@@ -112,3 +112,22 @@ def extract_dates_top_words_per_party(data):
             party_top_words[party].append(word)
     
     return party_dates, party_top_words
+
+# Function to extract dates, top words values for each speech
+def extract_dates_top_words_per_speech(data):
+    speech_dates = {}
+    speech_top_words = {}
+    
+    for speech_data in data:
+        speech_id = speech_data["speech_id"]
+        top_words = speech_data["top_words"]
+        speech_dates[speech_id] = []
+        speech_top_words[speech_id] = []
+        
+        for item in top_words:
+            date = datetime.strptime(item["date"], '%d/%m/%Y')
+            word = item["word"]
+            speech_dates[speech_id].append(date)
+            speech_top_words[speech_id].append(word)
+
+    return speech_dates, speech_top_words

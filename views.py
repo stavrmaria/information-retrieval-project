@@ -1,6 +1,6 @@
 import pickle
 import sys
-from flask import Blueprint, Response, jsonify, redirect, render_template, request
+from flask import Blueprint, Response, jsonify, render_template, request
 import json
 import os
 import time
@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 from index import construct_inverted_index, save_index
 from vectorizer import calculate_tf_idf, save_tf_idf
 from results import get_results, get_result
-from plotter import extract_dates_top_words_per_member, get_top_keywords, extract_dates_top_words_per_party
+from plotter import extract_dates_top_words_per_member, get_top_keywords, extract_dates_top_words_per_party, extract_dates_top_words_per_speech
 
 DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
 # DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020_sample.csv'
@@ -27,6 +27,7 @@ DATA_FOLDER = 'data'
 TEMPLATES_FOLDER = 'templates'
 MEMBER_PLOT_PATH = 'top_keywords_member_plot.html'
 PARTY_PLOT_PATH = 'top_keywords_party_plot.html'
+SPEECH_PLOT_PATH = 'top_keywords_speech_plot.html'
 
 NO_KEYWORDS = 10
 
@@ -40,6 +41,7 @@ tfidf_vectorizer_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER)
 top_keywords_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TOP_KEYWORDS_FILE)
 member_plot_html_path = os.path.join(os.path.join(os.getcwd(), TEMPLATES_FOLDER), MEMBER_PLOT_PATH)
 party_plot_html_path = os.path.join(os.path.join(os.getcwd(), TEMPLATES_FOLDER), PARTY_PLOT_PATH)
+speech_plot_html_path = os.path.join(os.path.join(os.getcwd(), TEMPLATES_FOLDER), SPEECH_PLOT_PATH)
 
 content_type='application/json; charset=utf-8'
 views = Blueprint(__name__, "views")
@@ -167,3 +169,34 @@ def display_top_keywords_party_plot():
 
     # Render the HTML template with the plot
     return render_template('top_keywords_party_plot.html')
+
+# Create a new endpoint to render the HTML template with the plot
+@views.route('/top_keywords_speech_plot')
+def display_top_keywords_speech_plot():
+    # Extract dates, top words, and TF-IDF values for each speech
+    if not os.path.exists(top_keywords_file_path):
+        get_top_keywords(csv_file_path, tfidf_file_path, tfidf_vocab_file_path, top_keywords_file_path)
+    with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
+        data = json.load(json_file)
+    top_speeches = data['top_speeches']
+    speech_dates, speech_top_words = extract_dates_top_words_per_speech(top_speeches)
+
+    # Plot keyword trends for each speech using Plotly
+    fig = go.Figure()
+    for speech_id, top_words in speech_top_words.items():
+        fig.add_trace(go.Scatter(y=list(speech_dates[speech_id]), x=top_words, mode='markers', name=f'Speech {speech_id}'))
+
+    fig.update_layout(
+        title='Top Keywords Over Time (By Speech)',
+        xaxis_title='Date',
+        yaxis_title='Top Keywords',
+        xaxis=dict(tickangle=45),
+        legend=dict(x=1.05, y=1),
+    )
+
+    # Save the plot as an HTML file
+    plot_html_path = 'templates/top_keywords_speech_plot.html'
+    fig.write_html(plot_html_path)
+
+    # Render the HTML template with the plot
+    return render_template('top_keywords_speech_plot.html')
