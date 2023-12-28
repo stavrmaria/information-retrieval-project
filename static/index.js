@@ -61,4 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
         body.classList.remove('dark-mode');
     }
 });
-  
+
+function redirectToTopKeywordsMemberPlot() {
+    // Redirect to the /top_keywords_member_plot endpoint
+    window.location.href = '/top_keywords_member_plot';
+}
+
+function redirectToTopKeywordsPartyPlot() {
+    // Redirect to the /top_keywords_party_plot endpoint
+    window.location.href = '/top_keywords_party_plot';
+}
