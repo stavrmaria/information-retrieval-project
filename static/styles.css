@@ -113,7 +113,7 @@ input {
 
 .keyword__button:hover {
     background-color: var(--primary-button-color);
-    color: #ffffff; /* Change text color on hover if needed */
+    color: #ffffff;
 }
 
 .keywords_options__box {

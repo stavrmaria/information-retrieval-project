@@ -71,3 +71,8 @@ function redirectToTopKeywordsPartyPlot() {
     // Redirect to the /top_keywords_party_plot endpoint
     window.location.href = '/top_keywords_party_plot';
 }
+
+function redirectToTopKeywordsSpeechPlot() {
+    // Redirect to the /top_keywords_speech_plot endpoint
+    window.location.href = '/top_keywords_speech_plot';
+}

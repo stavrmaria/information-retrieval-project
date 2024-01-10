@@ -10,6 +10,7 @@ from index import construct_inverted_index, save_index
 from vectorizer import calculate_tf_idf, save_tf_idf
 from results import get_results, get_result
 from plotter import extract_dates_top_words_per_member, get_top_keywords, extract_dates_top_words_per_party, extract_dates_top_words_per_speech
+from pairwise_similarities import get_top_k_pairwise_similarities
 
 DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
 # DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020_sample.csv'
@@ -30,6 +31,7 @@ PARTY_PLOT_PATH = 'top_keywords_party_plot.html'
 SPEECH_PLOT_PATH = 'top_keywords_speech_plot.html'
 
 NO_KEYWORDS = 10
+SIMILARITY_THRESHOLD = 0.6
 
 # Get the data file path
 current_path = os.getcwd()
@@ -200,3 +202,10 @@ def display_top_keywords_speech_plot():
 
     # Render the HTML template with the plot
     return render_template('top_keywords_speech_plot.html')
+
+@views.route('/pairwise_similarities')
+def pairwise_similarities():
+    k = 10
+    similarities = get_top_k_pairwise_similarities(csv_file_path, tfidf_vectorizer_file_path, k, SIMILARITY_THRESHOLD)
+    response = Response(json.dumps(similarities, ensure_ascii=False), content_type=content_type)
+    return response
