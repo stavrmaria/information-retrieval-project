@@ -1,12 +1,10 @@
-import os
-import sys
-import joblib
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import json
 import pandas as pd
 from index import process_text
-
+from concurrent.futures import ProcessPoolExecutor
+import multiprocessing
 from scipy import sparse
 import pickle
 
@@ -16,13 +14,25 @@ def load_inverted_index(json_file, encoding='utf-8'):
         inverted_index = json.load(file)
     return dict(inverted_index)
 
+def process_text_parallel(chunk):
+    return chunk.apply(process_text)
+
 def calculate_tf_idf(data_file_path):
-    df = pd.read_csv(data_file_path, usecols=['speech'])
-    processed_text = df['speech'].apply(process_text)
+    chunksize = 100000
+    df_chunks = pd.read_csv(data_file_path, usecols=['speech'], chunksize=chunksize)
+    df = pd.concat(df_chunks)
+
+    num_cores = multiprocessing.cpu_count()
+    max_workers= num_cores // 2
+
+    # Process text in parallel
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        processed_text = list(executor.map(process_text_parallel, np.array_split(df['speech'], len(df))))
+    processed_text = pd.concat(processed_text)
 
     tfidf_vectorizer = TfidfVectorizer(
         max_df=0.9,
-        max_features=None
+        max_features=6000
     )
 
     tfidf_matrix = tfidf_vectorizer.fit_transform(processed_text)
