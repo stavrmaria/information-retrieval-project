@@ -16,6 +16,7 @@ DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
 # DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020_sample.csv'
 DATA_FILE = 'sample_data.csv'
 DATA_FILE = 'output_file.csv'
+SAMPLE_DATA_FILE = 'output_sample.csv'
 # DATA_FILE = 'test_data.csv'
 
 INDEX_FILE = 'inverted_index.json'
@@ -36,6 +37,7 @@ SIMILARITY_THRESHOLD = 0.6
 # Get the data file path
 current_path = os.getcwd()
 csv_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), DATA_FILE)
+csv_sample_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), SAMPLE_DATA_FILE)
 index_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), INDEX_FILE)
 tfidf_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_FILE)
 tfidf_vocab_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_VOCAB_FILE)
@@ -112,7 +114,7 @@ def display_top_keywords_member_plot():
     
     # Extract dates, top words, and TF-IDF values for each member
     if not os.path.exists(top_keywords_file_path):
-        get_top_keywords(csv_file_path, tfidf_file_path, tfidf_vocab_file_path, top_keywords_file_path)
+        get_top_keywords(csv_sample_file_path, tfidf_file_path, tfidf_vocab_file_path, top_keywords_file_path)
     with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     top_speeches_per_member = data['top_speeches_per_member']
@@ -146,7 +148,7 @@ def display_top_keywords_party_plot():
 
     # Extract dates, top words, and TF-IDF values for each party
     if not os.path.exists(top_keywords_file_path):
-        get_top_keywords(csv_file_path, tfidf_file_path, tfidf_vocab_file_path, top_keywords_file_path)
+        get_top_keywords(csv_sample_file_path, tfidf_file_path, tfidf_vocab_file_path, top_keywords_file_path)
     with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     top_speeches_per_party = data['top_speeches_political_party']
@@ -177,7 +179,7 @@ def display_top_keywords_party_plot():
 def display_top_keywords_speech_plot():
     # Extract dates, top words, and TF-IDF values for each speech
     if not os.path.exists(top_keywords_file_path):
-        get_top_keywords(csv_file_path, tfidf_file_path, tfidf_vocab_file_path, top_keywords_file_path)
+        get_top_keywords(csv_sample_file_path, tfidf_file_path, tfidf_vocab_file_path, top_keywords_file_path)
     with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     top_speeches = data['top_speeches']
