@@ -11,6 +11,7 @@ from vectorizer import calculate_tf_idf, save_tf_idf
 from results import get_results, get_result
 from plotter import extract_dates_top_words_per_member, get_top_keywords, extract_dates_top_words_per_party, extract_dates_top_words_per_speech
 from pairwise_similarities import get_top_k_pairwise_similarities
+from lsa import get_topics
 
 DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
 # DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020_sample.csv'
@@ -210,4 +211,10 @@ def pairwise_similarities():
     k = 10
     similarities = get_top_k_pairwise_similarities(csv_file_path, tfidf_vectorizer_file_path, k, SIMILARITY_THRESHOLD)
     response = Response(json.dumps(similarities, ensure_ascii=False), content_type=content_type)
+    return response
+
+@views.route('/lsa')
+def lsa():
+    topics = get_topics(tfidf_file_path, tfidf_vectorizer_file_path)
+    response = Response(json.dumps(topics, ensure_ascii=False), content_type=content_type)
     return response
