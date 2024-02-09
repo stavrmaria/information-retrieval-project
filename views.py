@@ -32,6 +32,10 @@ MEMBER_PLOT_PATH = 'top_keywords_member_plot.html'
 PARTY_PLOT_PATH = 'top_keywords_party_plot.html'
 SPEECH_PLOT_PATH = 'top_keywords_speech_plot.html'
 
+TFIDF_SAMPLE_FILE = 'tfidf_matrix_sample.npz'
+TFIDF_VOCAB_SAMPLE_FILE = 'tfidf_vocab_sample.npz'
+TFIDF_VEC_SAMPLE_FILE = 'tfidf_vect_sample.pkl'
+
 NO_KEYWORDS = 10
 SIMILARITY_THRESHOLD = 0.6
 
@@ -47,6 +51,10 @@ top_keywords_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TO
 member_plot_html_path = os.path.join(os.path.join(os.getcwd(), TEMPLATES_FOLDER), MEMBER_PLOT_PATH)
 party_plot_html_path = os.path.join(os.path.join(os.getcwd(), TEMPLATES_FOLDER), PARTY_PLOT_PATH)
 speech_plot_html_path = os.path.join(os.path.join(os.getcwd(), TEMPLATES_FOLDER), SPEECH_PLOT_PATH)
+
+tfidf_sample_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_SAMPLE_FILE)
+tfidf_vocab_sample_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_VOCAB_SAMPLE_FILE)
+tfidf_vectorizer_sample_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_VEC_SAMPLE_FILE)
 
 content_type='application/json; charset=utf-8'
 views = Blueprint(__name__, "views")
@@ -107,6 +115,23 @@ def get_tftidf():
     response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
     return response
 
+@views.route('/get_tfidf_sample')
+def get_tftidf_sample():
+    # Load the tf-idf index from the JSON file
+    if not os.path.exists(tfidf_sample_file_path):
+        start = time.time()
+        tfidf_measurements = calculate_tf_idf(csv_sample_file_path)
+        end = time.time()
+        print('TF-IDF calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
+        start = time.time()
+        save_tf_idf(tfidf_measurements, tfidf_sample_file_path, tfidf_vocab_sample_file_path, tfidf_vectorizer_sample_file_path)
+        end = time.time()
+        print('TF-IDF files saving calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
+    
+    a = {"status": "finished"}
+    response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
+    return response
+
 # Create a new endpoint to render the HTML template with the plot
 @views.route('/top_keywords_member_plot')
 def display_top_keywords_member_plot():
@@ -115,7 +140,7 @@ def display_top_keywords_member_plot():
     
     # Extract dates, top words, and TF-IDF values for each member
     if not os.path.exists(top_keywords_file_path):
-        get_top_keywords(csv_sample_file_path, tfidf_file_path, tfidf_vocab_file_path, top_keywords_file_path)
+        get_top_keywords(csv_sample_file_path, tfidf_sample_file_path, tfidf_vocab_sample_file_path, top_keywords_file_path)
     with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     top_speeches_per_member = data['top_speeches_per_member']
@@ -149,7 +174,7 @@ def display_top_keywords_party_plot():
 
     # Extract dates, top words, and TF-IDF values for each party
     if not os.path.exists(top_keywords_file_path):
-        get_top_keywords(csv_sample_file_path, tfidf_file_path, tfidf_vocab_file_path, top_keywords_file_path)
+        get_top_keywords(csv_sample_file_path, tfidf_sample_file_path, tfidf_vocab_sample_file_path, top_keywords_file_path)
     with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     top_speeches_per_party = data['top_speeches_political_party']
@@ -180,7 +205,7 @@ def display_top_keywords_party_plot():
 def display_top_keywords_speech_plot():
     # Extract dates, top words, and TF-IDF values for each speech
     if not os.path.exists(top_keywords_file_path):
-        get_top_keywords(csv_sample_file_path, tfidf_file_path, tfidf_vocab_file_path, top_keywords_file_path)
+        get_top_keywords(csv_sample_file_path, tfidf_sample_file_path, tfidf_vocab_sample_file_path, top_keywords_file_path)
     with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     top_speeches = data['top_speeches']
