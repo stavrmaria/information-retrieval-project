@@ -9,6 +9,8 @@ import sys
 
 def calculate_similarity(pair, member_feature_vectors, threshold):
     member1, member2 = pair
+    if member1 > member2:
+        return None
     similarity_score = cosine_similarity(np.asarray(member_feature_vectors[member1]), np.asarray(member_feature_vectors[member2]))[0][0]
     if similarity_score >= threshold:
         return (member1, member2, similarity_score)

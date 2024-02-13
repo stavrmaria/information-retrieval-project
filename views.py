@@ -1,4 +1,3 @@
-import pickle
 import sys
 from flask import Blueprint, Response, jsonify, render_template, request
 import json
@@ -235,11 +234,10 @@ def display_top_keywords_speech_plot():
 def pairwise_similarities():
     k = 100
     start = time.time()
-    similarities = get_top_k_pairwise_similarities(csv_sample_file_path, tfidf_vectorizer_file_path, k, SIMILARITY_THRESHOLD)
+    top_k_pairs = get_top_k_pairwise_similarities(csv_sample_file_path, tfidf_vectorizer_file_path, k, SIMILARITY_THRESHOLD)
     end = time.time()
     print('Pairwise Similarities calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
-    response = Response(json.dumps(similarities, ensure_ascii=False), content_type=content_type)
-    return response
+    return render_template('pairwise_similarities.html', top_k_pairs=top_k_pairs)
 
 @views.route('/lsa')
 def lsa():
