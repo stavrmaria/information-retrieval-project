@@ -15,7 +15,7 @@ from lsa import get_topics
 
 DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
 # DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020_sample.csv'
-DATA_FILE = 'sample_data.csv'
+# DATA_FILE = 'sample_data.csv'
 DATA_FILE = 'output_file.csv'
 SAMPLE_DATA_FILE = 'output_sample.csv'
 # DATA_FILE = 'test_data.csv'
@@ -233,8 +233,11 @@ def display_top_keywords_speech_plot():
 
 @views.route('/pairwise_similarities')
 def pairwise_similarities():
-    k = 10
-    similarities = get_top_k_pairwise_similarities(csv_file_path, tfidf_vectorizer_file_path, k, SIMILARITY_THRESHOLD)
+    k = 100
+    start = time.time()
+    similarities = get_top_k_pairwise_similarities(csv_sample_file_path, tfidf_vectorizer_file_path, k, SIMILARITY_THRESHOLD)
+    end = time.time()
+    print('Pairwise Similarities calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
     response = Response(json.dumps(similarities, ensure_ascii=False), content_type=content_type)
     return response
 
