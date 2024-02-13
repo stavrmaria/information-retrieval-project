@@ -241,6 +241,9 @@ def pairwise_similarities():
 
 @views.route('/lsa')
 def lsa():
-    topics = get_topics(tfidf_file_path, tfidf_vectorizer_file_path)
+    start = time.time()
+    topics = get_topics(tfidf_sample_file_path, tfidf_vectorizer_sample_file_path)
+    end = time.time()
+    print('LSA calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
     response = Response(json.dumps(topics, ensure_ascii=False), content_type=content_type)
     return response

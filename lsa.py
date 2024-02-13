@@ -24,11 +24,16 @@ def get_topics(tfidf_file_path, tfidf_vectorizer_file_path):
     lsa = TruncatedSVD(n_components=num_components, n_iter=100, random_state=42)
 
     # Fit SVD model on data
-    lsa.fit_transform(tfidf_matrix)
+    matrix_k = lsa.fit_transform(tfidf_matrix)
 
     # Get Singular values and Components 
     Sigma = lsa.singular_values_ 
     V_transpose = lsa.components_.T
+
+    print('TF-IDF Matrix: ', tfidf_matrix.shape, file=sys.stderr)
+    print('Sigma: ', Sigma.shape, file=sys.stderr)
+    print('V_transpose: ', V_transpose.shape, file=sys.stderr)
+    print('Matrix_k: ', matrix_k.shape, file=sys.stderr)
 
     # ----------------------------------------------------------------------------------
     
