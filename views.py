@@ -11,6 +11,7 @@ from results import get_results, get_result
 from plotter import extract_dates_top_words_per_member, get_top_keywords, extract_dates_top_words_per_party, extract_dates_top_words_per_speech
 from pairwise_similarities import get_top_k_pairwise_similarities
 from lsa import get_topics
+from clustering import get_matrix_k, get_clusters
 
 DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
 # DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020_sample.csv'
@@ -246,4 +247,14 @@ def lsa():
     end = time.time()
     print('LSA calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
     response = Response(json.dumps(topics, ensure_ascii=False), content_type=content_type)
+    return response
+
+@views.route('/clustering')
+def clusterin():
+    start = time.time()
+    matrix_k = get_matrix_k(tfidf_sample_file_path)
+    clusters = get_clusters(matrix_k, csv_sample_file_path)
+    end = time.time()
+    print('Clustering time: ', (end - start), ' sec(s)', file=sys.stderr)
+    response = Response(json.dumps(clusters, ensure_ascii=False), content_type=content_type)
     return response
