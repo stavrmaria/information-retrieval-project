@@ -62,7 +62,7 @@ tfidf_vectorizer_sample_file_path = os.path.join(os.path.join(os.getcwd(), DATA_
 content_type='application/json; charset=utf-8'
 views = Blueprint(__name__, "views")
 
-@views.route('/get_index')
+@views.route('/process_data')
 def process_data():
     create_files(DATA_FOLDER, INPUT_DATA_FILE, DATA_FILE, SAMPLE_DATA_FILE, FRACTION)
     a = {"status": "finished"}
@@ -145,6 +145,8 @@ def get_tftidf_sample():
 # Create a new endpoint to render the HTML template with the plot
 @views.route('/top_keywords_member_plot')
 def display_top_keywords_member_plot():
+    start = time.time()
+    
     if os.path.exists(member_plot_html_path):
         return render_template('top_keywords_member_plot.html')
     
@@ -173,12 +175,17 @@ def display_top_keywords_member_plot():
     plot_html_path = 'templates/top_keywords_member_plot.html'
     fig.write_html(plot_html_path)
 
+    end = time.time()
+    print('Top Keywords per Member time: ', (end - start), ' sec(s)', file=sys.stderr)
+
     # Render the HTML template with the plot
     return render_template('top_keywords_member_plot.html')
 
 # Create a new endpoint to render the HTML template with the plot
 @views.route('/top_keywords_party_plot')
 def display_top_keywords_party_plot():
+    start = time.time()
+
     if os.path.exists(party_plot_html_path):
         return render_template('top_keywords_party_plot.html')
 
@@ -207,12 +214,16 @@ def display_top_keywords_party_plot():
     plot_html_path = 'templates/top_keywords_party_plot.html'
     fig.write_html(plot_html_path)
 
+    end = time.time()
+    print('Top Keywords per Party time: ', (end - start), ' sec(s)', file=sys.stderr)
+
     # Render the HTML template with the plot
     return render_template('top_keywords_party_plot.html')
 
 # Create a new endpoint to render the HTML template with the plot
 @views.route('/top_keywords_speech_plot')
 def display_top_keywords_speech_plot():
+    start = time.time()
     # Extract dates, top words, and TF-IDF values for each speech
     if not os.path.exists(top_keywords_file_path):
         get_top_keywords(csv_sample_file_path, tfidf_sample_file_path, tfidf_vocab_sample_file_path, top_keywords_file_path)
@@ -237,6 +248,9 @@ def display_top_keywords_speech_plot():
     # Save the plot as an HTML file
     plot_html_path = 'templates/top_keywords_speech_plot.html'
     fig.write_html(plot_html_path)
+
+    end = time.time()
+    print('Top Keywords per Speech time: ', (end - start), ' sec(s)', file=sys.stderr)
 
     # Render the HTML template with the plot
     return render_template('top_keywords_speech_plot.html')
