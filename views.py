@@ -4,6 +4,7 @@ import json
 import os
 import time
 import plotly.graph_objects as go
+import networkx as nx
 
 from index import construct_inverted_index, save_index
 from vectorizer import calculate_tf_idf, save_tf_idf
@@ -12,10 +13,11 @@ from plotter import extract_dates_top_words_per_member, get_top_keywords, extrac
 from pairwise_similarities import get_top_k_pairwise_similarities
 from lsa import get_topics
 from clustering import get_matrix_k, get_clusters
+from reader import create_files
 
-DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
+INPUT_DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
 # DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020_sample.csv'
-# DATA_FILE = 'sample_data.csv'
+DATA_FILE = 'sample_data.csv'
 DATA_FILE = 'output_file.csv'
 SAMPLE_DATA_FILE = 'output_sample.csv'
 # DATA_FILE = 'test_data.csv'
@@ -38,6 +40,7 @@ TFIDF_VEC_SAMPLE_FILE = 'tfidf_vect_sample.pkl'
 
 NO_KEYWORDS = 10
 SIMILARITY_THRESHOLD = 0.6
+FRACTION = 0.1
 
 # Get the data file path
 current_path = os.getcwd()
@@ -58,6 +61,13 @@ tfidf_vectorizer_sample_file_path = os.path.join(os.path.join(os.getcwd(), DATA_
 
 content_type='application/json; charset=utf-8'
 views = Blueprint(__name__, "views")
+
+@views.route('/get_index')
+def process_data():
+    create_files(DATA_FOLDER, INPUT_DATA_FILE, DATA_FILE, SAMPLE_DATA_FILE, FRACTION)
+    a = {"status": "finished"}
+    response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
+    return response
 
 @views.route('/', methods=['GET'])
 def index():
@@ -230,10 +240,6 @@ def display_top_keywords_speech_plot():
 
     # Render the HTML template with the plot
     return render_template('top_keywords_speech_plot.html')
-
-import networkx as nx
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
 
 @views.route('/pairwise_similarities')
 def pairwise_similarities():
