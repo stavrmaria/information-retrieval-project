@@ -40,10 +40,6 @@ def get_clusters(matrix_k, csv_file_path):
     kmeans = KMeans(n_clusters=num_clusters, random_state=42)
     cluster_labels = kmeans.fit_predict(matrix_k)
 
-    # Print the cluster labels for each speech
-    # for speech_id, label in enumerate(cluster_labels):
-    #     print(f"Speech {speech_id + 1}: Cluster {label + 1}")
-
     # Print the first 10 speeches in cluster 2
     cluster_to_print = 2
     speeches_in_cluster = df.loc[cluster_labels == (cluster_to_print - 1), df.columns[10]].head(10)
@@ -51,7 +47,5 @@ def get_clusters(matrix_k, csv_file_path):
     print(f"First 10 speeches in Cluster {cluster_to_print}:\n")
     for idx, speech in enumerate(speeches_in_cluster):
         print(f"Speech {idx + 1}:\n{speech}\n")
-    
-    clusters = []
 
-    return clusters
+    return

@@ -348,18 +348,20 @@ def pairwise_similarities():
 @views.route('/lsa')
 def lsa():
     start = time.time()
-    topics = get_topics(tfidf_sample_file_path, tfidf_vectorizer_sample_file_path)
+    topics = get_topics(tfidf_file_path, tfidf_vectorizer_file_path)
     end = time.time()
     print('LSA calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
-    response = Response(json.dumps(topics, ensure_ascii=False), content_type=content_type)
+    a = {"status": "finished"}
+    response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
     return response
 
 @views.route('/clustering')
 def clusterin():
     start = time.time()
-    matrix_k = get_matrix_k(tfidf_sample_file_path)
-    clusters = get_clusters(matrix_k, csv_sample_file_path)
+    matrix_k = get_matrix_k(tfidf_file_path)
+    get_clusters(matrix_k, csv_file_path)
     end = time.time()
     print('Clustering time: ', (end - start), ' sec(s)', file=sys.stderr)
-    response = Response(json.dumps(clusters, ensure_ascii=False), content_type=content_type)
+    a = {"status": "finished"}
+    response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
     return response
