@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/result.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <title>IR | Paiwise Similarities</title>
+</head>
+<body>
+    <button class="theme__button" onclick="toggleTheme()"><i class="uil uil-moon"></i></button>
+
+    <div class="title">
+        <h1>Clustering k=5</h1>
+    </div>
+    {% for cluster in clusters %}
+        <div class="pair">
+            <h3>
+                <div class="details">
+                    Cluster {{ cluster['cluster_id'] }}
+                </div>
+            </h3>
+            <div class="score">
+                speeches: {{ cluster['speeches'] }}
+            </div>
+        </div>
+    {% endfor %}
+
+    <script type="text/javascript" src="{{ url_for('static', filename='results.js') }}"></script>
+</body>
+</html>

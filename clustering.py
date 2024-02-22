@@ -34,18 +34,40 @@ def get_clusters(matrix_k, csv_file_path):
     df = pd.read_csv(csv_file_path)
 
     # Number of clusters you want to create
-    num_clusters = 5  # You can choose the number of clusters based on your requirements
+    num_clusters = 5
 
     # Apply K-means clustering
     kmeans = KMeans(n_clusters=num_clusters, random_state=42)
     cluster_labels = kmeans.fit_predict(matrix_k)
 
-    # Print the first 10 speeches in cluster 2
-    cluster_to_print = 2
-    speeches_in_cluster = df.loc[cluster_labels == (cluster_to_print - 1), df.columns[10]].head(10)
+    # # Print the first 10 speeches in cluster 2
+    # cluster_to_print = 2
+    # speeches_in_cluster = df.loc[cluster_labels == (cluster_to_print - 1), df.columns[10]].head(10)
 
-    print(f"First 10 speeches in Cluster {cluster_to_print}:\n")
-    for idx, speech in enumerate(speeches_in_cluster):
-        print(f"Speech {idx + 1}:\n{speech}\n")
+    # print(f"First 10 speeches in Cluster {cluster_to_print}:\n")
+    # for idx, speech in enumerate(speeches_in_cluster):
+    #     print(f"Speech {idx + 1}:\n{speech}\n")
 
-    return
+    # return
+
+    # Initialize a list to store the structured representation of clusters
+    structured_clusters = []
+
+    for cluster_id in range(num_clusters):
+        # Get indices of speeches in the current cluster
+        speeches_indices = df.index[cluster_labels == cluster_id]
+
+        # Extract the first 10 speeches in the current cluster
+        speeches_in_cluster = df.loc[speeches_indices, df.columns[10]].head(10).tolist()
+
+        # Append the structured representation of the cluster to the list
+        structured_cluster = {
+            "cluster_id": cluster_id,
+            "speeches": speeches_in_cluster
+        }
+
+        structured_clusters.append(structured_cluster)
+
+        print(f"Cluster {cluster_id}:\n{speeches_in_cluster}\n")
+
+    return structured_clusters

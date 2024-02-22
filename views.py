@@ -258,19 +258,19 @@ def lsa():
     topics = get_topics(tfidf_file_path, tfidf_vectorizer_file_path)
     end = time.time()
     print('LSA calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
-    a = {"status": "finished"}
     return render_template('lsa.html', topics=topics)
 
 @views.route('/clustering')
 def clustering():
     start = time.time()
     matrix_k = get_matrix_k(tfidf_file_path)
-    get_clusters(matrix_k, csv_file_path)
+    clusters = get_clusters(matrix_k, csv_file_path)
     end = time.time()
     print('Clustering time: ', (end - start), ' sec(s)', file=sys.stderr)
-    a = {"status": "finished"}
-    response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
-    return response
+    # a = {"status": "finished"}
+    # response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
+    # return response
+    return render_template('clustering.html', clusters=clusters)
 
 def select_plot_files():
     global no_data_rows, no_sample_rows
