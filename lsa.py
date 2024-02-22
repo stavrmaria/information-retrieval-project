@@ -46,6 +46,7 @@ def get_topics(tfidf_file_path, tfidf_vectorizer_file_path):
 
     # Initialize a list to store the top terms for each topic
     topics = []
+    structured_topics = []
 
     for index, component in enumerate(lsa.components_):
         zipped = zip(terms, component)
@@ -57,6 +58,14 @@ def get_topics(tfidf_file_path, tfidf_vectorizer_file_path):
 
         topics.append(top_terms_list)
 
+        # Append the structured representation of the topic to the list
+        structured_topic = {
+            "topic_id": index,
+            "terms": top_terms_list
+        }
+
+        structured_topics.append(structured_topic)
+
         print("Topic "+str(index)+": ",top_terms_list, file=sys.stderr)
     
-    return topics
+    return structured_topics

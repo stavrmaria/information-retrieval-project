@@ -259,8 +259,7 @@ def lsa():
     end = time.time()
     print('LSA calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
     a = {"status": "finished"}
-    response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
-    return response
+    return render_template('lsa.html', topics=topics)
 
 @views.route('/clustering')
 def clustering():
