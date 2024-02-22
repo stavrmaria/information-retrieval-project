@@ -6,6 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from concurrent.futures import ProcessPoolExecutor
 import networkx as nx
+import plotly.graph_objects as go
 
 def calculate_similarity(pair, member_feature_vectors, threshold):
     member1, member2 = pair
@@ -65,7 +66,7 @@ def get_top_k_pairwise_similarities(csv_file_path, tfidf_vectorizer_file_path, k
 
     return top_k_pairs
 
-def construct_ps_graph(top_k_pairs):
+def construct_ps_graph(top_k_pairs, k):
     graph = nx.Graph()
     # Add edges with weights from top k pairs
     for pair in top_k_pairs:

@@ -76,9 +76,9 @@ def process_data():
 @views.route('/', methods=['GET'])
 def index():
     query = request.args.get('search-input', type=str)
+    if not os.path.exists(csv_file_path):
+        process_data()
     if not query:
-        if not os.path.exists(csv_file_path):
-            process_data()
         return render_template('index.html')
     start = time.time()
     if not os.path.exists(tfidf_file_path):
@@ -152,7 +152,7 @@ def get_tftidf_sample():
 @views.route('/top_keywords_speech_plot')
 def display_top_keywords_speech_plot():
     start = time.time()
-    csv_file, tfidf_file, tfidf_vocab_file = select_plot_files()
+    csv_file, tfidf_file, tfidf_vocab_file, _ = select_plot_files()
     with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     top_speeches = data['top_speeches']
@@ -184,7 +184,7 @@ def display_top_keywords_member_plot():
         return render_template('top_keywords_member_plot.html')
     
     # Extract dates, top words, and TF-IDF values for each member
-    csv_file, tfidf_file, tfidf_vocab_file = select_plot_files()
+    csv_file, tfidf_file, tfidf_vocab_file, _ = select_plot_files()
     with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     top_speeches_per_member = data['top_speeches_per_member']
@@ -216,7 +216,7 @@ def display_top_keywords_party_plot():
         return render_template(PARTY_PLOT_PATH)
     
     # Extract dates, top words, and TF-IDF values for each member
-    csv_file, tfidf_file, tfidf_vocab_file = select_plot_files()
+    csv_file, tfidf_file, tfidf_vocab_file, _ = select_plot_files()
     with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     top_speeches_per_party = data['top_speeches_political_party']
@@ -240,15 +240,16 @@ def display_top_keywords_party_plot():
     print('Top Keywords per Party time: ', (end - start), ' sec(s)', file=sys.stderr)
     return render_template('top_keywords_party_plot.html')
 
-@views.route('/pairwise_similarities')
+@views.route('/pairwise_similarities', methods = ["GET"])
 def pairwise_similarities():
-    k = 100
+    csv_file, tfidf_file, tfidf_vocab_file, tfidf_vec_file = select_plot_files()
+    k = int(request.args.get('kval', 10))
     start = time.time()
-    top_k_pairs = get_top_k_pairwise_similarities(csv_sample_file_path, tfidf_vectorizer_file_path, k, SIMILARITY_THRESHOLD)
+    top_k_pairs = get_top_k_pairwise_similarities(csv_file, tfidf_vec_file, k, SIMILARITY_THRESHOLD)
     end = time.time()
     print('Pairwise Similarities calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
-
-    construct_ps_graph(top_k_pairs)
+    k = len(top_k_pairs)
+    construct_ps_graph(top_k_pairs, k)
     return render_template('pairwise_similarities.html', top_k_pairs=top_k_pairs)
 
 @views.route('/lsa')
@@ -274,15 +275,15 @@ def clustering():
 
 def select_plot_files():
     global no_data_rows, no_sample_rows
-    print("No Rows (select_plot_files) = ", no_data_rows, file=sys.stderr)
     if not os.path.exists(csv_file_path):
         no_data_rows, _ = create_files(DATA_FOLDER, INPUT_DATA_FILE, DATA_FILE, SAMPLE_DATA_FILE, FRACTION)
-    csv_file, tfidf_file, tfidf_vocab_file = csv_file_path, tfidf_file_path, tfidf_vocab_file_path
-    if no_data_rows <= ROWS_LIMIT and not os.path.exists(tfidf_sample_file_path):
-        csv_file, tfidf_file, tfidf_vocab_file = csv_sample_file_path, tfidf_sample_file_path, tfidf_vocab_sample_file_path
-        get_tftidf_sample()
-    elif no_data_rows > ROWS_LIMIT and not os.path.exists(tfidf_file_path):
-        get_tftidf()
+    print(no_data_rows, file=sys.stderr)
+    csv_file, tfidf_file, tfidf_vocab_file, tfidf_vec_file = csv_file_path, tfidf_file_path, tfidf_vocab_file_path, tfidf_vectorizer_file_path
+    if no_data_rows > ROWS_LIMIT:
+        csv_file, tfidf_file, tfidf_vocab_file, tfidf_vec_file = csv_sample_file_path, tfidf_sample_file_path, tfidf_vocab_sample_file_path, tfidf_vectorizer_sample_file_path
+        if not os.path.exists(tfidf_sample_file_path): get_tftidf_sample()
+    elif no_data_rows <= ROWS_LIMIT:
+        if not os.path.exists(tfidf_file_path): get_tftidf()
     if not os.path.exists(top_keywords_file_path):
         get_top_keywords(csv_file, tfidf_file, tfidf_vocab_file, top_keywords_file_path)
-    return (csv_file, tfidf_file, tfidf_vocab_file)
+    return (csv_file, tfidf_file, tfidf_vocab_file, tfidf_vec_file)
