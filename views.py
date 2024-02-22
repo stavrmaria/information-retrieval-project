@@ -4,20 +4,18 @@ import json
 import os
 import time
 import plotly.graph_objects as go
-import networkx as nx
 
 from index import construct_inverted_index, save_index
 from vectorizer import calculate_tf_idf, save_tf_idf
 from results import get_results, get_result
 from plotter import extract_dates_top_words_per_member, get_top_keywords, extract_dates_top_words_per_party, extract_dates_top_words_per_speech
-from pairwise_similarities import get_top_k_pairwise_similarities
+from pairwise_similarities import get_top_k_pairwise_similarities, construct_ps_graph
 from lsa import get_topics
 from clustering import get_matrix_k, get_clusters
 from reader import create_files
 
 INPUT_DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
-# DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020_sample.csv'
-DATA_FILE = 'sample_data.csv'
+INPUT_DATA_FILE = 'sample_data.csv'
 DATA_FILE = 'output_file.csv'
 SAMPLE_DATA_FILE = 'output_sample.csv'
 # DATA_FILE = 'test_data.csv'
@@ -41,6 +39,7 @@ TFIDF_VEC_SAMPLE_FILE = 'tfidf_vect_sample.pkl'
 NO_KEYWORDS = 10
 SIMILARITY_THRESHOLD = 0.6
 FRACTION = 0.1
+ROWS_LIMIT = 1000
 
 # Get the data file path
 current_path = os.getcwd()
@@ -59,12 +58,17 @@ tfidf_sample_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TF
 tfidf_vocab_sample_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_VOCAB_SAMPLE_FILE)
 tfidf_vectorizer_sample_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_VEC_SAMPLE_FILE)
 
+no_data_rows = 0
+no_sample_rows = 0
+
 content_type='application/json; charset=utf-8'
 views = Blueprint(__name__, "views")
 
 @views.route('/process_data')
 def process_data():
-    create_files(DATA_FOLDER, INPUT_DATA_FILE, DATA_FILE, SAMPLE_DATA_FILE, FRACTION)
+    global no_data_rows, no_sample_rows
+    no_data_rows, no_sample_rows = create_files(DATA_FOLDER, INPUT_DATA_FILE, DATA_FILE, SAMPLE_DATA_FILE, FRACTION)
+    print("No Rows (process_data) = ", no_data_rows, file=sys.stderr)
     a = {"status": "finished"}
     response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
     return response
@@ -73,6 +77,8 @@ def process_data():
 def index():
     query = request.args.get('search-input', type=str)
     if not query:
+        if not os.path.exists(csv_file_path):
+            process_data()
         return render_template('index.html')
     start = time.time()
     if not os.path.exists(tfidf_file_path):
@@ -143,90 +149,10 @@ def get_tftidf_sample():
     return response
 
 # Create a new endpoint to render the HTML template with the plot
-@views.route('/top_keywords_member_plot')
-def display_top_keywords_member_plot():
-    start = time.time()
-    
-    if os.path.exists(member_plot_html_path):
-        return render_template('top_keywords_member_plot.html')
-    
-    # Extract dates, top words, and TF-IDF values for each member
-    if not os.path.exists(top_keywords_file_path):
-        get_top_keywords(csv_sample_file_path, tfidf_sample_file_path, tfidf_vocab_sample_file_path, top_keywords_file_path)
-    with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
-        data = json.load(json_file)
-    top_speeches_per_member = data['top_speeches_per_member']
-    member_dates, member_top_words = extract_dates_top_words_per_member(top_speeches_per_member)
-
-    # Plot keyword trends for each member using Plotly
-    fig = go.Figure()
-    for member, dates in member_dates.items():
-        fig.add_trace(go.Scatter(x=member_top_words[member], y=dates, mode='markers', name=member))
-
-    fig.update_layout(
-        title='Top Keywords Over Time (By Member)',
-        xaxis_title='Top Keywords',
-        yaxis_title='Date',
-        xaxis=dict(tickangle=45),
-        legend=dict(x=1.05, y=1),
-    )
-
-    # Save the plot as an HTML file
-    plot_html_path = 'templates/top_keywords_member_plot.html'
-    fig.write_html(plot_html_path)
-
-    end = time.time()
-    print('Top Keywords per Member time: ', (end - start), ' sec(s)', file=sys.stderr)
-
-    # Render the HTML template with the plot
-    return render_template('top_keywords_member_plot.html')
-
-# Create a new endpoint to render the HTML template with the plot
-@views.route('/top_keywords_party_plot')
-def display_top_keywords_party_plot():
-    start = time.time()
-
-    if os.path.exists(party_plot_html_path):
-        return render_template('top_keywords_party_plot.html')
-
-    # Extract dates, top words, and TF-IDF values for each party
-    if not os.path.exists(top_keywords_file_path):
-        get_top_keywords(csv_sample_file_path, tfidf_sample_file_path, tfidf_vocab_sample_file_path, top_keywords_file_path)
-    with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
-        data = json.load(json_file)
-    top_speeches_per_party = data['top_speeches_political_party']
-    party_dates, party_top_words = extract_dates_top_words_per_party(top_speeches_per_party)
-
-    # Plot keyword trends for each party using Plotly
-    fig = go.Figure()
-    for party, dates in party_dates.items():
-        fig.add_trace(go.Scatter(x=party_top_words[party], y=dates, mode='markers', name=party))
-
-    fig.update_layout(
-        title='Top Keywords Over Time (By party)',
-        xaxis_title='Top Keywords',
-        yaxis_title='Date',
-        xaxis=dict(tickangle=45),
-        legend=dict(x=1.05, y=1),
-    )
-
-    # Save the plot as an HTML file
-    plot_html_path = 'templates/top_keywords_party_plot.html'
-    fig.write_html(plot_html_path)
-
-    end = time.time()
-    print('Top Keywords per Party time: ', (end - start), ' sec(s)', file=sys.stderr)
-
-    # Render the HTML template with the plot
-    return render_template('top_keywords_party_plot.html')
-
-# Create a new endpoint to render the HTML template with the plot
 @views.route('/top_keywords_speech_plot')
 def display_top_keywords_speech_plot():
     start = time.time()
-    # Extract dates, top words, and TF-IDF values for each speech
-    if not os.path.exists(top_keywords_file_path):
-        get_top_keywords(csv_sample_file_path, tfidf_sample_file_path, tfidf_vocab_sample_file_path, top_keywords_file_path)
+    csv_file, tfidf_file, tfidf_vocab_file = select_plot_files()
     with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     top_speeches = data['top_speeches']
@@ -236,7 +162,6 @@ def display_top_keywords_speech_plot():
     fig = go.Figure()
     for speech_id, top_words in speech_top_words.items():
         fig.add_trace(go.Scatter(y=list(speech_dates[speech_id]), x=top_words, mode='markers', name=f'Speech {speech_id}'))
-
     fig.update_layout(
         title='Top Keywords Over Time (By Speech)',
         xaxis_title='Date',
@@ -246,14 +171,74 @@ def display_top_keywords_speech_plot():
     )
 
     # Save the plot as an HTML file
-    plot_html_path = 'templates/top_keywords_speech_plot.html'
-    fig.write_html(plot_html_path)
-
+    fig.write_html(speech_plot_html_path)
     end = time.time()
     print('Top Keywords per Speech time: ', (end - start), ' sec(s)', file=sys.stderr)
-
-    # Render the HTML template with the plot
     return render_template('top_keywords_speech_plot.html')
+
+# Create a new endpoint to render the HTML template with the plot
+@views.route('/top_keywords_member_plot')
+def display_top_keywords_member_plot():
+    start = time.time()
+    if os.path.exists(member_plot_html_path):
+        return render_template('top_keywords_member_plot.html')
+    
+    # Extract dates, top words, and TF-IDF values for each member
+    csv_file, tfidf_file, tfidf_vocab_file = select_plot_files()
+    with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
+        data = json.load(json_file)
+    top_speeches_per_member = data['top_speeches_per_member']
+    member_dates, member_top_words = extract_dates_top_words_per_member(top_speeches_per_member)
+
+    # Plot keyword trends for each member using Plotly
+    fig = go.Figure()
+    for member, dates in member_dates.items():
+        fig.add_trace(go.Scatter(x=member_top_words[member], y=dates, mode='markers', name=member))
+    fig.update_layout(
+        title='Top Keywords Over Time (By Member)',
+        xaxis_title='Top Keywords',
+        yaxis_title='Date',
+        xaxis=dict(tickangle=45),
+        legend=dict(x=1.05, y=1),
+    )
+
+    # Save the plot as an HTML file
+    fig.write_html(member_plot_html_path)
+    end = time.time()
+    print('Top Keywords per Member time: ', (end - start), ' sec(s)', file=sys.stderr)
+    return render_template('top_keywords_member_plot.html')
+
+# Create a new endpoint to render the HTML template with the plot
+@views.route('/top_keywords_party_plot')
+def display_top_keywords_party_plot():
+    start = time.time()
+    if os.path.exists(party_plot_html_path):
+        return render_template(PARTY_PLOT_PATH)
+    
+    # Extract dates, top words, and TF-IDF values for each member
+    csv_file, tfidf_file, tfidf_vocab_file = select_plot_files()
+    with open(top_keywords_file_path, 'r', encoding='utf-8') as json_file:
+        data = json.load(json_file)
+    top_speeches_per_party = data['top_speeches_political_party']
+    party_dates, party_top_words = extract_dates_top_words_per_party(top_speeches_per_party)
+
+    # Plot keyword trends for each party using Plotly
+    fig = go.Figure()
+    for party, dates in party_dates.items():
+        fig.add_trace(go.Scatter(x=party_top_words[party], y=dates, mode='markers', name=party))
+    fig.update_layout(
+        title='Top Keywords Over Time (By party)',
+        xaxis_title='Top Keywords',
+        yaxis_title='Date',
+        xaxis=dict(tickangle=45),
+        legend=dict(x=1.05, y=1),
+    )
+
+    # Save the plot as an HTML file
+    fig.write_html(party_plot_html_path)
+    end = time.time()
+    print('Top Keywords per Party time: ', (end - start), ' sec(s)', file=sys.stderr)
+    return render_template('top_keywords_party_plot.html')
 
 @views.route('/pairwise_similarities')
 def pairwise_similarities():
@@ -263,86 +248,7 @@ def pairwise_similarities():
     end = time.time()
     print('Pairwise Similarities calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
 
-    graph = nx.Graph()
-    # Add edges with weights from top k pairs
-    for pair in top_k_pairs:
-        name1, name2, weight = pair
-        graph.add_edge(name1, name2, weight=weight)
-    
-    # Extract node positions for plotting
-    pos = nx.spring_layout(graph)
-
-    # Create edges
-    edge_x = []
-    edge_y = []
-    for edge in graph.edges():
-        x0, y0 = pos[edge[0]]
-        x1, y1 = pos[edge[1]]
-        edge_x.append(x0)
-        edge_x.append(x1)
-        edge_x.append(None)
-        edge_y.append(y0)
-        edge_y.append(y1)
-        edge_y.append(None)
-
-    # Create nodes
-    node_x = []
-    node_y = []
-    for node in graph.nodes():
-        x, y = pos[node]
-        node_x.append(x)
-        node_y.append(y)
-
-    # Create edge trace
-    edge_trace = go.Scatter(
-        x=edge_x, y=edge_y,
-        line=dict(width=0.5, color='#888'),
-        hoverinfo='none',
-        mode='lines')
-
-    # Create node trace
-    node_trace = go.Scatter(
-        x=node_x, y=node_y,
-        mode='markers',
-        hoverinfo='text',
-        marker=dict(
-            showscale=True,
-            colorscale='YlGnBu',
-            reversescale=True,
-            color=[],
-            size=10,
-            colorbar=dict(
-                thickness=15,
-                title='Node Connections',
-                xanchor='left',
-                titleside='right'
-            ),
-            line_width=2))
-
-    # Add node info to hover text
-    node_adjacencies = []
-    node_text = []
-    for node, adjacencies in enumerate(graph.adjacency()):
-        node_adjacencies.append(len(adjacencies[1]))
-        node_text.append(f'{adjacencies[0]}<br># of connections: {len(adjacencies[1])}')
-
-    node_trace.marker.color = node_adjacencies
-    node_trace.text = node_text
-
-    # Create figure
-    fig = go.Figure(data=[edge_trace, node_trace],
-                layout=go.Layout(
-                    title=f'Top {k} Pairs Graph',
-                    titlefont_size=16,
-                    showlegend=False,
-                    hovermode='closest',
-                    margin=dict(b=20,l=5,r=5,t=40),
-                    xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
-
-    # Show plot
-    fig.show()
-
+    construct_ps_graph(top_k_pairs)
     return render_template('pairwise_similarities.html', top_k_pairs=top_k_pairs)
 
 @views.route('/lsa')
@@ -356,7 +262,7 @@ def lsa():
     return response
 
 @views.route('/clustering')
-def clusterin():
+def clustering():
     start = time.time()
     matrix_k = get_matrix_k(tfidf_file_path)
     get_clusters(matrix_k, csv_file_path)
@@ -365,3 +271,18 @@ def clusterin():
     a = {"status": "finished"}
     response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
     return response
+
+def select_plot_files():
+    global no_data_rows, no_sample_rows
+    print("No Rows (select_plot_files) = ", no_data_rows, file=sys.stderr)
+    if not os.path.exists(csv_file_path):
+        no_data_rows, _ = create_files(DATA_FOLDER, INPUT_DATA_FILE, DATA_FILE, SAMPLE_DATA_FILE, FRACTION)
+    csv_file, tfidf_file, tfidf_vocab_file = csv_file_path, tfidf_file_path, tfidf_vocab_file_path
+    if no_data_rows <= ROWS_LIMIT and not os.path.exists(tfidf_sample_file_path):
+        csv_file, tfidf_file, tfidf_vocab_file = csv_sample_file_path, tfidf_sample_file_path, tfidf_vocab_sample_file_path
+        get_tftidf_sample()
+    elif no_data_rows > ROWS_LIMIT and not os.path.exists(tfidf_file_path):
+        get_tftidf()
+    if not os.path.exists(top_keywords_file_path):
+        get_top_keywords(csv_file, tfidf_file, tfidf_vocab_file, top_keywords_file_path)
+    return (csv_file, tfidf_file, tfidf_vocab_file)

@@ -4,6 +4,7 @@ import pandas as pd
 import sys
 
 def create_files(data_folder, data_file, output_file, output_sample_file, fraction=0.1):
+    print('Processing the data...', file=sys.stderr)
     csv_file_path = os.path.join(os.path.join(os.getcwd(), data_folder), data_file)
     
     # Using pandas & chunks
@@ -42,3 +43,4 @@ def create_files(data_folder, data_file, output_file, output_sample_file, fracti
 
     end_time = time.time()
     print('Saving execution time: ', (end_time - start_time), 'sec', file=sys.stderr)
+    return len(output_df), len(sample_df)
