@@ -76,3 +76,10 @@ function redirectToTopKeywordsSpeechPlot() {
     // Redirect to the /top_keywords_speech_plot endpoint
     window.location.href = '/top_keywords_speech_plot';
 }
+
+function updateSliderFromTextInput(value) {
+    value = parseInt(value);
+    value = Math.max(1, Math.min(value, 1000));
+    document.getElementById("sliderK").value = value;
+    document.getElementById("textInputK").value = value;
+}

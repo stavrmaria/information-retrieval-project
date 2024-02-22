@@ -21,10 +21,18 @@
         </div>
     </form>
 
-    <div class="keywords_options__box">
-        <button class="keyword__button" onclick="redirectToTopKeywordsSpeechPlot()">Top Keywords Per Speech</button>
-        <button class="keyword__button" onclick="redirectToTopKeywordsMemberPlot()">Top Keywords Per Member</button>
-        <button class="keyword__button" onclick="redirectToTopKeywordsPartyPlot()">Top Keywords Per Political Party</button>
+    <div class="options__box">
+        <div class="k__container">
+            <label class="k__label" for="textInputK">K:</label>
+            <input class="k__input" type="text" id="textInputK" value="1" onchange="updateSliderFromTextInput(this.value)">
+            <input class="k__slider" type="range" id="sliderK" min="1" max="1000" value="1" oninput="updateSliderFromTextInput(this.value)">
+        </div>
+        
+        <button class="option__button" onclick="redirectToTopKeywordsSpeechPlot()">Top Keywords Per Speech</button>
+        <button class="option__button" onclick="redirectToTopKeywordsMemberPlot()">Top Keywords Per Member</button>
+        <button class="option__button" onclick="redirectToTopKeywordsPartyPlot()">Top Keywords Per Political Party</button>
+
+        <button class="option__button" onclick="redirectToTopKeywordsPartyPlot()">Pairwise Similarities</button>
     </div>
 
     <script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
