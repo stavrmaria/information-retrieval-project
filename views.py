@@ -18,7 +18,6 @@ INPUT_DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
 INPUT_DATA_FILE = 'sample_data.csv'
 DATA_FILE = 'output_file.csv'
 SAMPLE_DATA_FILE = 'output_sample.csv'
-# DATA_FILE = 'test_data.csv'
 
 INDEX_FILE = 'inverted_index.json'
 TFIDF_FILE = 'tfidf_index.json'
@@ -256,7 +255,8 @@ def pairwise_similarities():
 @views.route('/lsa')
 def lsa():
     start = time.time()
-    topics = get_topics(tfidf_file_path, tfidf_vectorizer_file_path)
+    csv_file, tfidf_file, tfidf_vocab_file, tfidf_vec_file = select_plot_files()
+    topics = get_topics(tfidf_file, tfidf_vec_file)
     end = time.time()
     print('LSA calculation time: ', (end - start), ' sec(s)', file=sys.stderr)
     return render_template('lsa.html', topics=topics)
@@ -266,8 +266,9 @@ def clustering():
     start = time.time()
     k = int(request.args.get('kval', 10))
     if k > CLUSTERING_LIMIT: k = CLUSTERING_LIMIT
-    matrix_k = get_matrix_k(tfidf_file_path)
-    clusters = get_clusters(matrix_k, csv_file_path, k)
+    csv_file, tfidf_file, tfidf_vocab_file, tfidf_vec_file = select_plot_files()
+    matrix_k = get_matrix_k(tfidf_file)
+    clusters = get_clusters(matrix_k, csv_file, k)
     end = time.time()
     print('Clustering time: ', (end - start), ' sec(s)', file=sys.stderr)
     return render_template('clustering.html', clusters=clusters)

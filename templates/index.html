@@ -29,11 +29,12 @@
                 <input class="k__slider" type="range" id="sliderK" min="1" max="1000" value="1" oninput="updateSliderFromTextInput(this.value)">
             </div>
             
-            <button type="submit" class="option__button" onclick="setAction('/pairwise_similarities')">Pairwise Similarities</button>
-            <button type="submit" class="option__button" onclick="setAction('/clustering')">Clustering</button>
             <button type="button" class="option__button" onclick="redirectToTopKeywordsSpeechPlot()">Top Keywords Per Speech</button>
             <button type="button" class="option__button" onclick="redirectToTopKeywordsMemberPlot()">Top Keywords Per Member</button>
             <button type="button" class="option__button" onclick="redirectToTopKeywordsPartyPlot()">Top Keywords Per Political Party</button>
+            <button type="submit" class="option__button" onclick="setAction('/pairwise_similarities')">Pairwise Similarities</button>
+            <button type="button" class="option__button" onclick="redirectToLSA()">LSA</button>
+            <button type="submit" class="option__button" onclick="setAction('/clustering')">Clustering</button>
         </div>
     </form>
 

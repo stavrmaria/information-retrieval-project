@@ -77,6 +77,11 @@ function redirectToTopKeywordsSpeechPlot() {
     window.location.href = '/top_keywords_speech_plot';
 }
 
+function redirectToLSA() {
+    // Redirect to the /lsa endpoint
+    window.location.href = '/lsa';
+}
+
 function updateSliderFromTextInput(value) {
     value = parseInt(value);
     value = Math.max(1, Math.min(value, 1000));
