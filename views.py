@@ -37,7 +37,7 @@ NO_KEYWORDS = 10
 SIMILARITY_THRESHOLD = 0.6
 FRACTION = 0.1
 ROWS_LIMIT = 1000
-CLUSTERING_LIMIT = 20
+CLUSTERING_LIMIT = 100
 
 # Get the data file path
 current_path = os.getcwd()

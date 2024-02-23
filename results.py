@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
 UPPER_WORDS_LIMIT = 10
-NO_RESULTS = 8
+NO_RESULTS = 10
 
 def read_csv(data_file_path, chunksize=1000):
     for chunk in pd.read_csv(data_file_path, chunksize=chunksize):
