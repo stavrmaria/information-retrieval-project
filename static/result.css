@@ -15,3 +15,31 @@ body {
     padding-top: 10px;
     padding-bottom: 10px;
 }
+
+.cluster {
+    cursor: pointer;
+    transition: text-decoration 0.3s ease;
+}
+
+.cluster:hover {
+    text-decoration: underline;
+}
+
+.cluster__pair {
+    margin-bottom: 20px;
+}
+
+.cluster__score {
+    transition: max-height 0.3s ease;
+    overflow: hidden;
+    max-height: 0;
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+}
+
+.cluster__score.show {
+    max-height: 300px; /* Adjust the maximum height to show before scrolling */
+}
+
+.cluster__speech {
+    margin-bottom: 10px;
+}

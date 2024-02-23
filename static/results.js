@@ -19,4 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
         body.classList.remove('dark-mode');
     }
 });
-  
+
+// Function to toggle content visibility
+function toggleContent(element) {
+    var score = element.nextElementSibling;
+    score.classList.toggle('show');
+}

@@ -11,17 +11,21 @@
     <button class="theme__button" onclick="toggleTheme()"><i class="uil uil-moon"></i></button>
 
     <div class="title">
-        <h1>Clustering k=5</h1>
+        <h1>Clustering</h1>
     </div>
     {% for cluster in clusters %}
-        <div class="pair">
-            <h3>
-                <div class="details">
+        <div class="cluster__pair">
+            <h3 class="cluster" onclick="toggleContent(this)">
+                <div class="cluster__details">
                     Cluster {{ cluster['cluster_id'] }}
                 </div>
             </h3>
-            <div class="score">
-                speeches: {{ cluster['speeches'] }}
+            <div class="cluster__score">
+                {% for speech in cluster['speeches'] %}
+                    <div class="cluster__speech">
+                        <span class="summary">{{ speech }}</span>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     {% endfor %}

@@ -29,13 +29,10 @@ def get_matrix_k(tfidf_file_path):
 
     return matrix_k
 
-def get_clusters(matrix_k, csv_file_path):
+def get_clusters(matrix_k, csv_file_path, num_clusters):
 
     df = pd.read_csv(csv_file_path)
-
-    # Number of clusters you want to create
-    num_clusters = 5
-
+    
     # Apply K-means clustering
     kmeans = KMeans(n_clusters=num_clusters, random_state=42)
     cluster_labels = kmeans.fit_predict(matrix_k)

@@ -40,6 +40,7 @@ NO_KEYWORDS = 10
 SIMILARITY_THRESHOLD = 0.6
 FRACTION = 0.1
 ROWS_LIMIT = 1000
+CLUSTERING_LIMIT = 20
 
 # Get the data file path
 current_path = os.getcwd()
@@ -263,13 +264,12 @@ def lsa():
 @views.route('/clustering')
 def clustering():
     start = time.time()
+    k = int(request.args.get('kval', 10))
+    if k > CLUSTERING_LIMIT: k = CLUSTERING_LIMIT
     matrix_k = get_matrix_k(tfidf_file_path)
-    clusters = get_clusters(matrix_k, csv_file_path)
+    clusters = get_clusters(matrix_k, csv_file_path, k)
     end = time.time()
     print('Clustering time: ', (end - start), ' sec(s)', file=sys.stderr)
-    # a = {"status": "finished"}
-    # response = Response(json.dumps(a, ensure_ascii=False), content_type=content_type)
-    # return response
     return render_template('clustering.html', clusters=clusters)
 
 def select_plot_files():

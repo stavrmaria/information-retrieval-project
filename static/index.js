@@ -83,3 +83,7 @@ function updateSliderFromTextInput(value) {
     document.getElementById("sliderK").value = value;
     document.getElementById("textInputK").value = value;
 }
+
+function setAction(action) {
+    document.getElementById('form').action = action;
+}
