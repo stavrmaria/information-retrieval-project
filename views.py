@@ -5,7 +5,6 @@ import os
 import time
 import plotly.graph_objects as go
 
-from index import construct_inverted_index, save_index
 from vectorizer import calculate_tf_idf, save_tf_idf
 from results import get_results, get_result
 from plotter import extract_dates_top_words_per_member, get_top_keywords, extract_dates_top_words_per_party, extract_dates_top_words_per_speech
@@ -19,7 +18,6 @@ INPUT_DATA_FILE = 'sample_data.csv'
 DATA_FILE = 'output_file.csv'
 SAMPLE_DATA_FILE = 'output_sample.csv'
 
-INDEX_FILE = 'inverted_index.json'
 TFIDF_FILE = 'tfidf_index.json'
 TFIDF_FILE = 'tfidf_matrix.npz'
 TFIDF_VOCAB_FILE = 'tfidf_vocab.npz'
@@ -45,7 +43,6 @@ CLUSTERING_LIMIT = 20
 current_path = os.getcwd()
 csv_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), DATA_FILE)
 csv_sample_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), SAMPLE_DATA_FILE)
-index_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), INDEX_FILE)
 tfidf_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_FILE)
 tfidf_vocab_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_VOCAB_FILE)
 tfidf_vectorizer_file_path = os.path.join(os.path.join(os.getcwd(), DATA_FOLDER), TFIDF_VEC_FILE)
@@ -99,20 +96,6 @@ def show_result():
         return render_template('result.html', result=result)
     except Exception as e:
         return jsonify({"error": str(e)})
-
-@views.route('/get_index')
-def get_index():
-    # Load the inverted index from the JSON file
-    if not os.path.exists(index_file_path):
-        inverted_index = construct_inverted_index(csv_file_path)
-        save_index(inverted_index, index_file_path)
-
-    with open(index_file_path, 'r', encoding='utf-8') as json_file:
-        inverted_index = json.load(json_file)
-
-    # Serialize the data using json.dumps to avoid Unicode escape sequences
-    response = Response(json.dumps(inverted_index, ensure_ascii=False), content_type=content_type)
-    return response
 
 @views.route('/get_tfidf')
 def get_tftidf():

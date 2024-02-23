@@ -2,11 +2,27 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import json
 import pandas as pd
-from index import process_text
 from concurrent.futures import ProcessPoolExecutor
 import multiprocessing
 from scipy import sparse
 import pickle
+
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+import string
+from snowballstemmer import stemmer
+
+def process_text(text):
+    if isinstance(text, str):
+        greek_stemmer = stemmer("greek")
+        translator = str.maketrans("", "", string.punctuation)
+        text = text.translate(translator)
+        stop = set(stopwords.words('greek') + list(string.punctuation))
+        tokens = [i for i in word_tokenize(text.lower()) if i not in stop]
+        stemmed_tokens = [greek_stemmer.stemWord(token) for token in tokens]
+        return ' '.join(stemmed_tokens)
+    else:
+        return ''
 
 def load_inverted_index(json_file, encoding='utf-8'):
     # Load the inverted index from the JSON file

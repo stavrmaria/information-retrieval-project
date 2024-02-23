@@ -1,7 +1,7 @@
 import sys
 import pandas as pd
 from scipy import sparse
-from index import process_text
+from vectorizer import process_text
 
 import pickle
 from sklearn.metrics.pairwise import cosine_similarity
