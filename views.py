@@ -14,7 +14,6 @@ from clustering import get_matrix_k, get_clusters
 from reader import create_files
 
 INPUT_DATA_FILE = 'Greek_Parliament_Proceedings_1989_2020.csv'
-INPUT_DATA_FILE = 'sample_data.csv'
 DATA_FILE = 'output_file.csv'
 SAMPLE_DATA_FILE = 'output_sample.csv'
 
